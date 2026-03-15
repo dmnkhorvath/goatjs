@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoatJS — Node.js + TypeScript + EDA Learning Guide</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /* Markdown content styling */
+    #content h1 { font-size: 1.8rem; font-weight: 800; margin: 1.5rem 0 0.75rem; color: oklch(var(--p)); }
+    #content h2 { font-size: 1.4rem; font-weight: 700; margin: 1.25rem 0 0.5rem; color: oklch(var(--s)); border-bottom: 1px solid oklch(var(--b3)); padding-bottom: 0.3rem; }
+    #content h3 { font-size: 1.15rem; font-weight: 600; margin: 1rem 0 0.4rem; color: oklch(var(--a)); }
+    #content h4 { font-size: 1rem; font-weight: 600; margin: 0.75rem 0 0.3rem; }
+    #content p { margin: 0.5rem 0; line-height: 1.7; }
+    #content ul, #content ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+    #content li { margin: 0.25rem 0; line-height: 1.6; }
+    #content a { color: oklch(var(--p)); text-decoration: underline; text-underline-offset: 2px; }
+    #content a:hover { color: oklch(var(--pf)); }
+    #content code { background: oklch(var(--b3)); padding: 0.15rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+    #content pre { background: oklch(var(--b3)); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; }
+    #content pre code { background: none; padding: 0; }
+    #content table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.875rem; }
+    #content th { background: oklch(var(--b3)); padding: 0.5rem; text-align: left; font-weight: 600; border: 1px solid oklch(var(--b3)); }
+    #content td { padding: 0.5rem; border: 1px solid oklch(var(--b3)); }
+    #content blockquote { border-left: 3px solid oklch(var(--p)); padding-left: 1rem; margin: 0.75rem 0; opacity: 0.85; }
+    #content hr { border-color: oklch(var(--b3)); margin: 1.5rem 0; }
+    #content img { max-width: 100%; border-radius: 0.5rem; }
+    /* Table responsive wrapper */
+    #content .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    /* Active nav item */
+    .nav-item.active { background: oklch(var(--p) / 0.15); border-left: 3px solid oklch(var(--p)); }
+    /* Smooth scroll */
+    html { scroll-behavior: smooth; }
+    /* Loading spinner */
+    .loader { display: inline-block; width: 1.5rem; height: 1.5rem; border: 3px solid oklch(var(--b3)); border-top-color: oklch(var(--p)); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Back to top */
+    #back-to-top { transition: opacity 0.3s; }
+  </style>
+</head>
+<body class="min-h-screen bg-base-200">
+
+  <!-- Drawer layout for mobile -->
+  <div class="drawer lg:drawer-open">
+    <input id="drawer-toggle" type="checkbox" class="drawer-toggle">
+
+    <!-- Main content -->
+    <div class="drawer-content flex flex-col">
+      <!-- Navbar -->
+      <nav class="navbar bg-base-100 shadow-md sticky top-0 z-30">
+        <div class="flex-none lg:hidden">
+          <label for="drawer-toggle" class="btn btn-square btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </label>
+        </div>
+        <div class="flex-1">
+          <span class="text-lg font-bold px-2">\U0001f410 GoatJS</span>
+          <span class="text-xs opacity-60 hidden sm:inline">Node.js + TypeScript + EDA</span>
+        </div>
+        <div class="flex-none">
+          <button class="btn btn-ghost btn-sm" onclick="toggleTheme()">
+            <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Page content -->
+      <main class="flex-1 p-4 md:p-8 max-w-4xl mx-auto w-full">
+        <div id="content">
+          <div class="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+            <div class="loader"></div>
+            <p class="opacity-60">Loading content...</p>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer footer-center p-4 bg-base-100 text-base-content text-sm opacity-60">
+        <p>1,773+ curated resources &bull; 90-day learning path &bull; 2h/day</p>
+      </footer>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="drawer-side z-40">
+      <label for="drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="bg-base-100 w-72 min-h-full flex flex-col">
+        <div class="p-4 border-b border-base-300">
+          <h2 class="text-lg font-bold">\U0001f410 GoatJS Guide</h2>
+          <p class="text-xs opacity-60 mt-1">90 days &bull; 180 hours &bull; 1,773+ URLs</p>
+        </div>
+        <ul class="menu p-2 flex-1 overflow-y-auto" id="nav-menu">
+          <!-- Populated by JS -->
+        </ul>
+        <div class="p-3 border-t border-base-300 text-xs opacity-50 text-center">
+          <a href="https://gist.github.com/dmnkhorvath/9914c3832940c91778f9c8d4cd7f45d0" target="_blank" class="link">View on GitHub Gist</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Back to top -->
+  <button id="back-to-top" onclick="window.scrollTo({top:0})" class="btn btn-circle btn-primary btn-sm fixed bottom-6 right-6 opacity-0 pointer-events-none shadow-lg z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+    </svg>
+  </button>
+
+  <script>
+    const sections = [
+      { id: "master",     file: "docs/00_master_guide.md",      icon: "\U0001f4cb", title: "90-Day Master Guide" },
+      { id: "fundamentals", file: "docs/01_fundamentals.md",    icon: "\U0001f4d7", title: "Node.js & TS Fundamentals" },
+      { id: "eda",        file: "docs/02_eda.md",               icon: "\u26a1",     title: "Event-Driven Architecture" },
+      { id: "nestjs",     file: "docs/03a_nestjs_api_auth.md",  icon: "\U0001f3f0", title: "NestJS, API & Auth" },
+      { id: "orms",       file: "docs/03b_orms_patterns.md",    icon: "\U0001f5c4\ufe0f", title: "ORMs & Design Patterns" },
+      { id: "testing",    file: "docs/03c_testing_security.md", icon: "\U0001f9ea", title: "Testing & Security" },
+      { id: "logging",    file: "docs/03d_logging_monitoring.md",icon: "\U0001f4ca", title: "Logging & Monitoring" },
+      { id: "devops",     file: "docs/03e_devops_performance.md",icon: "\U0001f680", title: "DevOps & Performance" },
+      { id: "youtube",    file: "docs/04_youtube.md",           icon: "\U0001f3ac", title: "YouTube Resources" },
+    ];
+
+    let currentSection = "master";
+    const cache = {};
+
+    // Build nav
+    const navMenu = document.getElementById("nav-menu");
+    sections.forEach(s => {
+      const li = document.createElement("li");
+      li.innerHTML = `<a class="nav-item" data-id="${s.id}" onclick="loadSection('${s.id}')">
+        <span>${s.icon}</span>
+        <span>${s.title}</span>
+      </a>`;
+      navMenu.appendChild(li);
+    });
+
+    // Wrap tables for horizontal scroll on mobile
+    function wrapTables(html) {
+      return html.replace(/<table/g, '<div class="table-wrap"><table').replace(/<\/table>/g, "</table></div>");
+    }
+
+    // Load a section
+    async function loadSection(id) {
+      currentSection = id;
+
+      // Update nav active state
+      document.querySelectorAll(".nav-item").forEach(el => {
+        el.classList.toggle("active", el.dataset.id === id);
+      });
+
+      // Close drawer on mobile
+      document.getElementById("drawer-toggle").checked = false;
+
+      const content = document.getElementById("content");
+      const section = sections.find(s => s.id === id);
+
+      if (cache[id]) {
+        content.innerHTML = cache[id];
+        window.scrollTo({ top: 0 });
+        return;
+      }
+
+      content.innerHTML = `<div class="flex flex-col items-center justify-center min-h-[30vh] gap-4">
+        <div class="loader"></div>
+        <p class="opacity-60">Loading ${section.title}...</p>
+      </div>`;
+
+      try {
+        const res = await fetch(section.file);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const md = await res.text();
+        const html = wrapTables(marked.parse(md));
+        cache[id] = html;
+        content.innerHTML = html;
+      } catch (err) {
+        content.innerHTML = `<div class="alert alert-error">
+          <span>Failed to load ${section.title}: ${err.message}</span>
+        </div>`;
+      }
+      window.scrollTo({ top: 0 });
+    }
+
+    // Theme toggle
+    let darkMode = true;
+    function toggleTheme() {
+      darkMode = !darkMode;
+      document.documentElement.setAttribute("data-theme", darkMode ? "night" : "emerald");
+    }
+
+    // Back to top visibility
+    window.addEventListener("scroll", () => {
+      const btn = document.getElementById("back-to-top");
+      if (window.scrollY > 400) {
+        btn.classList.remove("opacity-0", "pointer-events-none");
+        btn.classList.add("opacity-100");
+      } else {
+        btn.classList.add("opacity-0", "pointer-events-none");
+        btn.classList.remove("opacity-100");
+      }
+    });
+
+    // Load default section
+    loadSection("master");
+  </script>
+</body>
+</html>
